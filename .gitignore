@@ -1,0 +1,34 @@
+# Secrets
+agent/auth.json
+*auth*.json
+*token*
+*secret*
+*.key
+*.pem
+
+# Sessions / runtime state
+agent/sessions/
+context-mode/
+**/sessions/
+**/logs/
+**/cache/
+*.log
+
+# Generated caches / binaries
+agent/mcp-cache.json
+agent/bin/
+*.db
+*.sqlite
+*.sqlite3
+
+# Backups
+*.backup
+*.bak
+*.backup-*
+agent/models.json.backup-*
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp

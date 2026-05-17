@@ -1,0 +1,11 @@
+{
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-5.5",
+  "lastChangelogVersion": "0.74.0",
+  "packages": [
+    "npm:pi-web-access",
+    "npm:pi-mcp-adapter",
+    "npm:context-mode"
+  ],
+  "defaultThinkingLevel": "high"
+}
