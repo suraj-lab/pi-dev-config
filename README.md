@@ -1,6 +1,9 @@
 # pi-dev-config
 
-Private configuration repo for Suraj's pi.dev agent setup.
+Configuration repo for my pi.dev agent setup. Pi is a really great and lean agent to use with frontier AI and local LLMs alike. This repo is my customised setup which I have configured for my own needs in Linux. 
+
+The SYSTEM.md and AGENTS.md are more like a restricted Claude while also staying as lean as I can make them for local AI. This is of course going to be a work in progress and anyone is free to take my setup.
+
 
 ## 1. Install Pi
 
@@ -76,5 +79,3 @@ rsync -av --exclude-from .gitignore ./ ~/.pi/
 ## Not Included
 
 Secrets, sessions, caches, binaries, databases, logs, and generated runtime state are ignored.
-
-Keep this repo private.
