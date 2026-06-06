@@ -72,6 +72,7 @@ rsync -av --exclude-from .gitignore ./ ~/.pi/
 - `agent/SYSTEM.md` — core system instructions
 - `agent/prompts/` — lean reusable prompts
 - `agent/skills/` — local skills and references
+- `agent/themes/` — Pi UI themes
 - `agent/*.json` — safe agent config only
 - `extensions/` — local extensions
 - `web-search.json` — web search config
