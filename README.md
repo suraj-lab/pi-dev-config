@@ -15,51 +15,128 @@ Follow the official platform-specific instructions for Linux, macOS, or Windows.
 
 ## 2. Clone This Config Repo
 
+### Windows PowerShell
+
+Install [Git for Windows](https://git-scm.com/download/win), then open PowerShell:
+
+```powershell
+$Repo = "$env:USERPROFILE\Projects\pi-dev-config"
+New-Item -ItemType Directory -Force "$env:USERPROFILE\Projects" | Out-Null
+git clone https://github.com/suraj-lab/pi-dev-config.git $Repo
+```
+
+If you prefer SSH, use this clone URL instead:
+
+```powershell
+git clone git@github.com:suraj-lab/pi-dev-config.git $Repo
+```
+
+### Linux/macOS/WSL
+
 ```bash
 mkdir -p ~/Projects
-git clone git@github.com:<your-user>/pi-dev-config.git ~/Projects/pi-dev-config
+git clone https://github.com/suraj-lab/pi-dev-config.git ~/Projects/pi-dev-config
 ```
 
 ## 3. Sync Config Into Pi
 
-Linux/macOS:
+Pi reads its config from `.pi` in your user home directory:
+
+- Windows: `%USERPROFILE%\.pi`
+- Linux/macOS/WSL: `~/.pi`
+
+### Windows PowerShell
+
+Use `robocopy` to copy the tracked config into your Windows Pi config directory while leaving secrets and runtime state alone:
+
+```powershell
+$Repo = "$env:USERPROFILE\Projects\pi-dev-config"
+$PiDir = "$env:USERPROFILE\.pi"
+
+New-Item -ItemType Directory -Force $PiDir | Out-Null
+
+robocopy $Repo $PiDir /E `
+  /XD ".git" "agent\sessions" "agent\bin" "context-mode" "logs" "cache" "sessions" `
+  /XF "*auth*.json" "*token*" "*secret*" "*.key" "*.pem" "*.db" "*.sqlite" "*.sqlite3" "*.log" "*.backup" "*.bak" "*.tmp" "Thumbs.db" ".DS_Store"
+
+# Robocopy uses exit codes 0-7 for success/copy-with-differences.
+if ($LASTEXITCODE -le 7) { $global:LASTEXITCODE = 0 }
+```
+
+Restart Pi after syncing so it reloads the updated config.
+
+### Linux/macOS/WSL
 
 ```bash
 mkdir -p ~/.pi
 rsync -av --exclude-from ~/Projects/pi-dev-config/.gitignore ~/Projects/pi-dev-config/ ~/.pi/
 ```
 
-Windows:
-
-Use WSL if possible and follow the Linux commands above.
-
-Otherwise, copy the repo contents into your Pi config directory manually, excluding:
-- `agent/auth.json`
-- sessions
-- caches
-- logs
-- databases
-- binaries
-
 ## 4. Add Local Secrets
 
-Create or restore local-only auth/secrets separately:
+Create or restore local-only auth/secrets separately.
+
+Windows PowerShell:
+
+```powershell
+notepad "$env:USERPROFILE\.pi\agent\auth.json"
+```
+
+Linux/macOS/WSL:
 
 ```bash
 $EDITOR ~/.pi/agent/auth.json
 ```
 
-Never commit `agent/auth.json`.
+Never commit `agent/auth.json`. It is intentionally excluded from the sync commands and `.gitignore`.
 
-## Updating Repo From Current System
+## Updating an Existing Windows Setup
+
+To pull the latest repo changes and sync them into Pi on Windows:
+
+```powershell
+$Repo = "$env:USERPROFILE\Projects\pi-dev-config"
+$PiDir = "$env:USERPROFILE\.pi"
+
+cd $Repo
+git pull
+
+robocopy $Repo $PiDir /E `
+  /XD ".git" "agent\sessions" "agent\bin" "context-mode" "logs" "cache" "sessions" `
+  /XF "*auth*.json" "*token*" "*secret*" "*.key" "*.pem" "*.db" "*.sqlite" "*.sqlite3" "*.log" "*.backup" "*.bak" "*.tmp" "Thumbs.db" ".DS_Store"
+if ($LASTEXITCODE -le 7) { $global:LASTEXITCODE = 0 }
+```
+
+## Saving Local Pi Config Changes Back to the Repo
+
+If you edit config directly under `.pi`, copy those safe files back into the repo and review the diff before committing.
+
+Windows PowerShell:
+
+```powershell
+$Repo = "$env:USERPROFILE\Projects\pi-dev-config"
+$PiDir = "$env:USERPROFILE\.pi"
+
+robocopy $PiDir $Repo /E `
+  /XD ".git" "agent\sessions" "agent\bin" "context-mode" "logs" "cache" "sessions" `
+  /XF "*auth*.json" "*token*" "*secret*" "*.key" "*.pem" "*.db" "*.sqlite" "*.sqlite3" "*.log" "*.backup" "*.bak" "*.tmp" "Thumbs.db" ".DS_Store"
+if ($LASTEXITCODE -le 7) { $global:LASTEXITCODE = 0 }
+
+cd $Repo
+git status
+git diff
+```
+
+Linux/macOS/WSL:
 
 ```bash
 cd ~/Projects/pi-dev-config
 rsync -av --exclude-from .gitignore ~/.pi/ ./
 git status
+git diff
 ```
 
-## Restoring Config From Repo
+## Restoring Config From Repo on Linux/macOS/WSL
 
 ```bash
 cd ~/Projects/pi-dev-config
