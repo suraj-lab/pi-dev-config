@@ -1,31 +1,60 @@
 ---
 name: arch
-description: Arch Linux system management, packages, services, debugging
+description: Arch Linux system management, packages, services, debugging, logs, storage, and desktop-adjacent administration
 ---
-# Arch Skill
+
+# Arch Linux Skill
+
+## Principles
+- Verify live state before changing system config.
+- Prefer read-only diagnostics before remediation.
+- Use Arch Wiki/current package docs when exact syntax or package names matter.
+- Ask before package install/remove, service-impacting changes, bootloader work, or destructive storage operations.
 
 ## Package Management
-pacman -Ss <term>          # search
-sudo pacman -S <pkg>       # install
-yay -S <pkg>               # AUR install
-pacman -Ql <pkg>           # files in package
-pacman -Qo <file>          # what owns file
-pacman -Rns <pkg>          # remove with deps
+```bash
+pacman -Ss <term>          # search repos
+pacman -Qi <pkg>           # installed package info
+pacman -Ql <pkg>           # package files
+pacman -Qo <file>          # owning package
+sudo pacman -S <pkg>       # install; ask first
+sudo pacman -Rns <pkg>     # remove; ask first
+yay -S <pkg>               # AUR install; ask first
+```
 
-## Systemd
+## Systemd / Logs
+```bash
 systemctl status <service>
 systemctl --user status <service>
-sudo systemctl enable --now <service>
-journalctl -u <service> -n 50
-journalctl --user -u <service> -n 50
+systemctl --failed
+journalctl -b -p err
+journalctl -u <service> -n 80
+journalctl --user -u <service> -n 80
+```
+
+## Storage Safety
+Before any disk, partition, filesystem, EFI, mount, format, clone, or bootloader operation:
+```bash
+lsblk -f
+mount
+df -h
+```
+Never rely on remembered NVMe numbering.
 
 ## Common Locations
-~/.config/          # user configs
-~/.local/share/     # user data
-/etc/               # system configs
-~/.local/bin/       # user scripts
+```text
+~/.config/          user configs
+~/.local/share/     user data
+~/.local/bin/       user scripts
+/etc/               system configs
+/var/log/           system logs
+```
 
-## Debugging
-dmesg | tail -20               # kernel messages
-journalctl -b -p err           # boot errors
-systemctl --failed             # failed services
+## Diagnostics
+```bash
+dmesg | tail -50
+ps aux --sort=-%cpu | head
+ss -tulpn
+df -h
+free -h
+```
